@@ -1,11 +1,65 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cam Web</title>
+  <title>Image Capture and Save</title>
 </head>
 <body>
-   <input type="file" capture="user" accept="image/*" >
+  <video id="video" autoplay></video>
+  <button id="captureButton">Capture</button>
+  <canvas id="canvas" style="display: none;"></canvas>
+  <button id="saveButton" disabled>Save</button>
+
+  <script>
+    // Get the video element
+    const video = document.getElementById('video');
+
+    // Check if the browser supports accessing the camera
+    if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+      // Access the camera stream
+      navigator.mediaDevices.getUserMedia({ video: true })
+        .then(function (stream) {
+          // Set the video source
+          video.srcObject = stream;
+        })
+        .catch(function (error) {
+          console.log('Error accessing camera:', error);
+        });
+    } else {
+      console.log('Camera access is not supported by this browser.');
+    }
+
+    // Capture button click event handler
+    const captureButton = document.getElementById('captureButton');
+    captureButton.addEventListener('click', function () {
+      // Get the canvas element
+      const canvas = document.getElementById('canvas');
+      const context = canvas.getContext('2d');
+
+      // Draw the current video frame onto the canvas
+      context.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+      // Enable the save button
+      const saveButton = document.getElementById('saveButton');
+      saveButton.disabled = false;
+    });
+
+    // Save button click event handler
+    const saveButton = document.getElementById('saveButton');
+    saveButton.addEventListener('click', function () {
+      // Get the canvas data URL
+      const canvas = document.getElementById('canvas');
+      const imageDataUrl = canvas.toDataURL();
+
+      // Create a link element for download
+      const link = document.createElement('a');
+      link.href = imageDataUrl;
+      link.download = 'captured_image.png';
+
+      // Simulate a click event to trigger the download
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    });
+  </script>
 </body>
 </html>
